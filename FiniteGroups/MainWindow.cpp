@@ -107,7 +107,7 @@ void MainWindow::drawGrid(FiniteGroup* g, int global_xOffset, int global_yOffset
 
 	if (g->getOperator() == FiniteGroup::EXPONENTIATION){
 		
-		const int MAX_EXPONENT = 20;
+		const int MAX_EXPONENT = g->getOrder();
 
 		// draw x-axis titles (exponents)
 		for (int i = 1; i <= MAX_EXPONENT; i++){
