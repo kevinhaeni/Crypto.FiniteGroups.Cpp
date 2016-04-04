@@ -10,8 +10,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 	QObject::connect(ui.btnDraw, SIGNAL(clicked()), this, SLOT(btnDraw_Clicked()));
 
+	
+	// Setup graphicsScene
 	scene = new QGraphicsScene(this);
-
 	ui.graphicsView->setScene(scene);
 	ui.graphicsView->viewport()->installEventFilter(this);
 	ui.graphicsView->setRenderHint(QPainter::Antialiasing);
@@ -20,10 +21,11 @@ MainWindow::MainWindow(QWidget *parent)
 	ui.graphicsView->scale(qreal(1.0), qreal(1.0));
 	ui.graphicsView->setDragMode(QGraphicsView::ScrollHandDrag);
 
+
+	// setup operator combobox
 	QString s = "Addition";
 	QString s2 = "Multiplication";
 	QString s3 = "Exponentiation";
-
 	ui.cbOperation->addItem(s);
 	ui.cbOperation->addItem(s2);
 	ui.cbOperation->addItem(s3);
@@ -35,6 +37,9 @@ MainWindow::~MainWindow()
 
 }
 
+/*
+  disable scrolling
+*/
 bool MainWindow::eventFilter(QObject *ob, QEvent *e)
 {
 	if (ob == ui.graphicsView->viewport() && e->type() == QEvent::Wheel) {
@@ -43,6 +48,9 @@ bool MainWindow::eventFilter(QObject *ob, QEvent *e)
 	return false;
 }
 
+/*
+  Zooming
+*/
 void  MainWindow::wheelEvent(QWheelEvent * event)
 {
 	ui.graphicsView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
@@ -70,16 +78,17 @@ void MainWindow::drawGrid(FiniteGroup* g, int global_xOffset, int global_yOffset
 	QPen outlinePen(Qt::black);
 	outlinePen.setWidth(1);
 
-	const int RECTSIZE = 80;
-	const int TEXTMARGIN = 20;
-	const int TITLEMARGIN = 80;
+	const int RECTSIZE = 80;		// width of a grid cell
+	const int TEXTMARGIN = 20;		// text margin
+	const int TITLEMARGIN = 80;		// title text margin
 	
+	// draw group title and order
 	QGraphicsTextItem* title = scene->addText(QString::fromStdWString(L"ℤ"));
 	title->setFont(QFont("Arial", 20));
 	title->setPos(TEXTMARGIN + 5, TEXTMARGIN + 5 + global_yOffset);
 	QGraphicsTextItem* modulo = scene->addText(QString::fromStdString(std::to_string(g->getModulo())));
 	modulo->setFont(QFont("Arial", 10));
-	modulo->setPos(TEXTMARGIN + 20, TEXTMARGIN + 22 + global_yOffset);
+	modulo->setPos(TEXTMARGIN + 30, TEXTMARGIN + 25 + global_yOffset);
 	QGraphicsTextItem* order = scene->addText(QString::fromStdString('|' + std::to_string(g->getOrder()) + '|'));
 	order->setFont(QFont("Arial", 12));
 	order->setPos(TEXTMARGIN + 10, TEXTMARGIN + 40 + global_yOffset);
@@ -99,7 +108,7 @@ void MainWindow::drawGrid(FiniteGroup* g, int global_xOffset, int global_yOffset
 		text->setFont(QFont("Arial", 20));
 		text->setPos(TEXTMARGIN, counter++ * RECTSIZE + RECTSIZE + TEXTMARGIN + global_yOffset);
 
-		QGraphicsTextItem* order = scene->addText(QString::fromStdString("ord(" + std::to_string(element.getOrder()) + ')'));
+		QGraphicsTextItem* order = scene->addText(QString::fromStdString("|" + std::to_string(element.getOrder()) + '|'));
 		order->setFont(QFont("Arial", 12));
 		order->setPos(TEXTMARGIN + 5, (counter-1) * RECTSIZE + RECTSIZE + TEXTMARGIN + 35 + global_yOffset);
 	}
@@ -107,7 +116,7 @@ void MainWindow::drawGrid(FiniteGroup* g, int global_xOffset, int global_yOffset
 
 	if (g->getOperator() == FiniteGroup::EXPONENTIATION){
 		
-		const int MAX_EXPONENT = g->getOrder();
+		const int MAX_EXPONENT = g->getOrder();		// number of columns in exponentiation mode
 
 		// draw x-axis titles (exponents)
 		for (int i = 1; i <= MAX_EXPONENT; i++){
@@ -116,12 +125,11 @@ void MainWindow::drawGrid(FiniteGroup* g, int global_xOffset, int global_yOffset
 			text->setPos(i * RECTSIZE + TEXTMARGIN, TEXTMARGIN + global_yOffset);
 		}
 
-		// do calculations
+		// pre calculate the matrix
 		unsigned int **matrix = new unsigned int*[g->getOrder()];
 		for (int i = 0; i < g->getOrder(); ++i){
 			matrix[i] = new unsigned int[MAX_EXPONENT];		// initialize 2 dimensional array
 		}
-
 
 		for (int i = 0; i < g->getElements().size(); i++){
 			for (unsigned int exp = 1; exp <= MAX_EXPONENT; exp++){

@@ -13,11 +13,10 @@
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
 x64/
 x86/
 build/
+GeneratedFiles
 bld/
 [Bb]in/
 [Oo]bj/
@@ -279,3 +278,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+FiniteGroups/GeneratedFiles/qrc_modulo.cpp

@@ -2,6 +2,9 @@
 #include <math.h>
 #include <MathUtils.h>
 
+/*
+	Default ctor to construct a finite group when a modulo is given
+*/
 FiniteGroup::FiniteGroup(unsigned int modulo, Operator op)
 	: operator_(op), modulo_(modulo)
 {
@@ -10,7 +13,9 @@ FiniteGroup::FiniteGroup(unsigned int modulo, Operator op)
 	case Operator::ADDITION:
 		inverse_ = 0;									// Inverse = 0
 		order_ = modulo;								// Get the order of the additive finite group		
-		for (unsigned int i = 0; i < modulo; i++)		// get all relative prime numbers (= Elements of the finite group)
+		
+		// get the elements of the group
+		for (unsigned int i = 0; i < modulo; i++)
 			elements_.push_back(Element(i));
 
 		break;
@@ -18,7 +23,7 @@ FiniteGroup::FiniteGroup(unsigned int modulo, Operator op)
 		inverse_ = 1;
 		order_ = MathUtils::phi(modulo);				// the order of a multiplicative group equals the eulers totient function
 
-		// get all relative prime numbers
+		// get the elements of the group (rel. prime numbers)
 		for (unsigned int i = 1; i < modulo; i++){
 			if (MathUtils::gcd(i, modulo) == 1){				
 				elements_.push_back(Element(i));
@@ -29,9 +34,14 @@ FiniteGroup::FiniteGroup(unsigned int modulo, Operator op)
 		throw std::logic_error("Unknown operator!");
 	}
 	
+	// set the order of every element
 	calculateElementOrder();	
 }
 
+
+/*
+	Alternative ctor which takes a list of elements as an argument; is used to construct subgroups
+*/
 FiniteGroup::FiniteGroup(std::vector<unsigned int> elements, unsigned int modulo, Operator op)
 	: operator_(op), modulo_(modulo)
 {
@@ -61,6 +71,9 @@ FiniteGroup::FiniteGroup(std::vector<unsigned int> elements, unsigned int modulo
 }
 
 
+/*
+  Calculate the element order of every element of the group
+*/
 void FiniteGroup::calculateElementOrder(){
 	for (std::vector<Element>::iterator it = elements_.begin(); it != elements_.end(); ++it)
 	{
